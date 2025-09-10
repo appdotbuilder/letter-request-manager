@@ -1,11 +1,23 @@
+import { db } from '../db';
+import { usersTable } from '../db/schema';
+import { eq } from 'drizzle-orm';
 import { type User } from '../schema';
 
-export async function getUserById(userId: number): Promise<User | null> {
-    // This is a placeholder declaration! Real code should be implemented here.
-    // The goal of this handler is retrieving a user by their ID for authentication and authorization.
-    // It should:
-    // 1. Return the user record if found
-    // 2. Return null if user not found
-    // 3. Used for session management and permission checks
-    return Promise.resolve(null);
-}
+export const getUserById = async (userId: number): Promise<User | null> => {
+  try {
+    const result = await db.select()
+      .from(usersTable)
+      .where(eq(usersTable.id, userId))
+      .limit(1)
+      .execute();
+
+    if (result.length === 0) {
+      return null;
+    }
+
+    return result[0];
+  } catch (error) {
+    console.error('Failed to get user by ID:', error);
+    throw error;
+  }
+};
